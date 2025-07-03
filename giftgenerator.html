@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>H190K Gift Code Generator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 420px;
+      width: 100%;
+    }
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 300;
+      text-align: center;
+      margin-bottom: 40px;
+      color: #fff;
+    }
+    .form-section {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .input-group { margin-bottom: 20px; }
+    label {
+      display: block;
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 6px;
+    }
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #333;
+      border-radius: 8px;
+      background: #1a1a1a;
+      color: #fff;
+      font-size: 14px;
+    }
+    input:focus {
+      outline: none;
+      border-color: #555;
+    }
+    input::placeholder { color: #666; }
+    .generate-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      background: #fff;
+      color: #000;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    #card-container {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    .gift-card {
+      background: transparent;
+      border: 1px solid #333;
+      border-radius: 16px;
+      padding: 32px 28px;
+      text-align: center;
+      position: relative;
+    }
+    .card-title {
+      font-size: 1.4rem;
+      margin-bottom: 24px;
+    }
+    .brand-info {
+      font-size: 15px;
+      color: #ccc;
+      margin-bottom: 20px;
+    }
+    .brand-name { color: #fff; font-weight: 600; }
+    .activation-code {
+      background: #000;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 16px;
+      font-family: monospace;
+      font-size: 16px;
+      color: #00ff88;
+      margin: 20px 0;
+      word-break: break-word;
+    }
+    .recipient {
+      font-size: 14px;
+      color: #aaa;
+      margin: 20px 0;
+    }
+    .recipient-name { color: #fff; font-weight: 500; }
+    .card-footer {
+      font-size: 12px;
+      color: #666;
+      margin-top: 24px;
+      line-height: 1.4;
+    }
+    .download-btn {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #333;
+      border-radius: 8px;
+      background: transparent;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .download-btn:hover {
+      background: #222;
+      border-color: #555;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>🎁 H190K Gift Generator</h1>
+
+    <div class="form-section">
+      <div class="input-group">
+        <label for="brand">💳 Brand</label>
+        <input type="text" id="brand" placeholder="iTunes, Steam, Netflix..." />
+      </div>
+      <div class="input-group">
+        <label for="code">🔐 Activation Code</label>
+        <input type="text" id="code" placeholder="Enter your gift code" />
+      </div>
+      <div class="input-group">
+        <label for="name">👤 Recipient</label>
+        <input type="text" id="name" placeholder="Who is this for?" />
+      </div>
+      <button class="generate-btn" onclick="generateCard()">✨ Generate Gift Card</button>
+    </div>
+
+    <div id="card-container">
+      <div class="gift-card" id="gift-card"></div>
+      <button class="download-btn" onclick="downloadCard('png')">📥 Download PNG (Transparent)</button>
+      <button class="download-btn" onclick="downloadCard('jpg')">📸 Download JPG (for WhatsApp)</button>
+    </div>
+  </div>
+
+  <!-- HTML2Canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    function generateCard() {
+      const brand = document.getElementById('brand').value.trim();
+      const code = document.getElementById('code').value.trim();
+      const name = document.getElementById('name').value.trim();
+
+      if (!brand || !code || !name) {
+        alert("⚠️ Please fill in all fields to generate your gift card.");
+        return;
+      }
+
+      const html = `
+        <div class="card-title">🎉 Gift Card Activated</div>
+        <div class="brand-info">Brand: <span class="brand-name">${escapeHtml(brand)}</span></div>
+        <div class="activation-code">${escapeHtml(code)}</div>
+        <div class="recipient">For: <span class="recipient-name">${escapeHtml(name)}</span></div>
+        <div class="card-footer">Thank you for your purchase ✨<br>Generated by H190K</div>
+      `;
+
+      document.getElementById('gift-card').innerHTML = html;
+      document.getElementById('card-container').style.display = 'block';
+      document.getElementById('card-container').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function downloadCard(type = 'png') {
+      const card = document.getElementById('gift-card');
+      const btnText = type === 'jpg' ? '📸 Downloading JPG...' : '📥 Downloading PNG...';
+      const btn = event.target;
+      const originalText = btn.textContent;
+
+      btn.textContent = btnText;
+      btn.disabled = true;
+
+      html2canvas(card, {
+        backgroundColor: type === 'jpg' ? '#1a1a1a' : null,
+        scale: 3,
+        useCORS: true,
+      }).then(canvas => {
+        const link = document.createElement('a');
+        const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
+        link.download = `H190K_Gift_Card_${timestamp}.${type}`;
+        link.href = type === 'jpg'
+          ? canvas.toDataURL('image/jpeg', 1.0)
+          : canvas.toDataURL('image/png');
+
+        link.click();
+        btn.textContent = '✅ Done!';
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.disabled = false;
+        }, 1500);
+      }).catch(err => {
+        console.error(err);
+        alert('❌ Download failed.');
+        btn.textContent = originalText;
+        btn.disabled = false;
+      });
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+
+</body>
+</html>
