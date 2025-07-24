@@ -4,6 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>H190K Gift Code Generator</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Gift Card Gen">
+  <link rel="apple-touch-icon" href="gift-card.png">
+  <link rel="icon" href="gift-card.png">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -157,8 +162,10 @@
 
     <div id="card-container">
       <div class="gift-card" id="gift-card"></div>
-      <button class="download-btn" onclick="downloadCard('png')">📥 Download PNG (Transparent)</button>
-      <button class="download-btn" onclick="downloadCard('jpg')">📸 Download JPG (for WhatsApp)</button>
+      <button class="download-btn" onclick="downloadCard('png')">📥 PNG Download</button>
+      <!-- <button class="download-btn" onclick="downloadCard('jpg')">📸 JPG Download</button> -->
+      <button class="download-btn" onclick="shareCard('png')">📤 Share PNG</button>
+      <!-- <button class="download-btn" onclick="shareCard('jpg')">📤 Share JPG</button> -->
     </div>
   </div>
 
@@ -198,35 +205,72 @@
       btn.disabled = true;
 
       html2canvas(card, {
-        backgroundColor: type === 'jpg' ? '#1a1a1a' : null,
-        scale: 3,
         useCORS: true,
-      }).then(canvas => {
+        allowTaint: true,
+        backgroundColor: '#000',
+        scale: 3,
+      }).then(function(canvas) {
         const link = document.createElement('a');
-        const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
-        link.download = `H190K_Gift_Card_${timestamp}.${type}`;
-        link.href = type === 'jpg'
-          ? canvas.toDataURL('image/jpeg', 1.0)
-          : canvas.toDataURL('image/png');
-
+        link.download = `gift-card.${type}`;
+        if (type === 'png') {
+          link.href = canvas.toDataURL('image/png');
+        } else {
+          link.href = canvas.toDataURL('image/jpeg', 0.9);
+        }
         link.click();
-        btn.textContent = '✅ Done!';
-        setTimeout(() => {
-          btn.textContent = originalText;
-          btn.disabled = false;
-        }, 1500);
-      }).catch(err => {
-        console.error(err);
-        alert('❌ Download failed.');
+
         btn.textContent = originalText;
         btn.disabled = false;
       });
     }
 
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
+    function shareCard(type = 'png') {
+      const card = document.getElementById('gift-card');
+      const btnText = type === 'jpg' ? '📤 Sharing JPG...' : '📤 Sharing PNG...';
+      const btn = event.target;
+      const originalText = btn.textContent;
+
+      btn.textContent = btnText;
+      btn.disabled = true;
+
+      html2canvas(card, {
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#000',
+        scale: 3,
+      }).then(function(canvas) {
+        canvas.toBlob(function(blob) {
+          if (navigator.share) {
+            const file = new File([blob], `gift-card.${type}`, { type: `image/${type === 'png' ? 'png' : 'jpeg'}` });
+            navigator.share({
+              files: [file],
+              title: 'Gift Card',
+              text: 'Check out this gift card!',
+            }).then(() => {
+              console.log('Share was successful.');
+            }).catch((error) => {
+              console.error('Sharing failed', error);
+              alert('Sharing failed: ' + error.message);
+            }).finally(() => {
+              btn.textContent = originalText;
+              btn.disabled = false;
+            });
+          } else {
+            alert('Web Share API is not supported in your browser. Please use the download option instead.');
+            btn.textContent = originalText;
+            btn.disabled = false;
+          }
+        }, `image/${type === 'png' ? 'png' : 'jpeg'}`);
+      });
+    }
+
+    function escapeHtml(unsafe) {
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/\'/g, "&#039;");
     }
   </script>
 
