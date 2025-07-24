@@ -245,7 +245,7 @@
             navigator.share({
               files: [file],
               title: 'Gift Card',
-              text: 'Check out this gift card!',
+              text: 'Thanks for your purchase, this is your gift card code!' + (code),
             }).then(() => {
               console.log('Share was successful.');
             }).catch((error) => {
