@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"/>
   <title>H190K Gift Code Generator</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Gift Card Gen">
   <link rel="apple-touch-icon" href="gift-card.png">
   <link rel="icon" href="gift-card.png">
@@ -13,12 +13,16 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html {
       background: #0a0a0a;
+      height: 100%;
+      overflow: hidden;
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: #0a0a0a;
       color: #fff;
-      min-height: 100vh;
+      height: 100%;
+      overflow: hidden;
+
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -252,7 +256,7 @@
             navigator.share({
               files: [file],
               title: 'Gift Card',
-              text: 'Thanks for your purchase, this is your gift card code!' + (code.value),
+              text: 'Thanks for your purchase, this is your gift card code!\n' + (code.value),
             }).then(() => {
               console.log('Share was successful.');
             }).catch((error) => {
